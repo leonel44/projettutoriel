@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription | MyCash</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #43cea2;
+      outline: none;
+    }
+
+    button {
+      background-color: #185a9d;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #104a80;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Créer un compte</h2>
+    <form id="registerForm">
+      <input type="text" name="name" placeholder="Nom complet" required />
+      <input type="email" name="email" placeholder="Adresse email" required />
+      <input type="password" name="password" placeholder="Mot de passe" required />
+      <button type="submit">S'inscrire</button>
+    </form>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = e.target.name.value;
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      const messageEl = document.getElementById('message');
+
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          messageEl.style.color = 'green';
+          messageEl.textContent = 'Inscription réussie ! Redirection...';
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        } else {
+          messageEl.style.color = 'red';
+          messageEl.textContent = data.error || 'Erreur lors de l\'inscription.';
+        }
+      } catch (err) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'Erreur de connexion au serveur.';
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statistiques | MyCash</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: linear-gradient(to right, #43cea2, #185a9d);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #f1c40f;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      background: white;
+      color: #185a9d;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    a:hover {
+      background: #eee;
+    }
+
+    footer {
+      margin-top: auto;
+      color: rgba(255,255,255,0.7);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Statistiques financières</h1>
+
+  <canvas id="revenueChart"></canvas>
+  <canvas id="expenseChart"></canvas>
+
+  <a href="dashboard.html">⬅ Retour au tableau de bord</a>
+
+  <footer>&copy; 2025 MyCash | Statistiques des transactions</footer>
+
+  <script>
+    const mois = ["Jan", "Fév", "Mars", "Avr", "Mai", "Juin"];
+
+    const revenus = [120000, 150000, 110000, 180000, 160000, 200000];
+    const depenses = [90000, 70000, 100000, 85000, 95000, 105000];
+
+    new Chart(document.getElementById("revenueChart"), {
+      type: 'bar',
+      data: {
+        labels: mois,
+        datasets: [{
+          label: "Revenus (FCFA)",
+          data: revenus,
+          backgroundColor: "#2ecc71"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          title: { display: true, text: 'Évolution des revenus' }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("expenseChart"), {
+      type: 'line',
+      data: {
+        labels: mois,
+        datasets: [{
+          label: "Dépenses (FCFA)",
+          data: depenses,
+          borderColor: "#e74c3c",
+          backgroundColor: "rgba(231, 76, 60, 0.2)",
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          title: { display: true, text: 'Évolution des dépenses' }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

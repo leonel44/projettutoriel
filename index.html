@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bienvenue sur MyCash</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      background: linear-gradient(to right, #43cea2, #185a9d);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      max-width: 600px;
+    }
+
+    .btns {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btns a {
+      background: white;
+      color: #185a9d;
+      text-decoration: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btns a:hover {
+      background: #f0f0f0;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bienvenue sur <span style="color: #f1c40f;">MyCash</span></h1>
+  <p>Gérez votre budget personnel de manière simple, rapide et sécurisée. Suivez vos revenus et dépenses en FCFA.</p>
+
+  <div class="btns">
+    <a href="register.html">Créer un compte</a>
+    <a href="login.html">Se connecter</a>
+    <a href="about.html">À propos</a>
+    <a href="stats.html">Statistiques</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <footer>&copy; 2025 MyCash. Tous droits réservés.</footer>
+
+</body>
+</html>

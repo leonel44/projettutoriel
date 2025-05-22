@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord | BudgetXpert</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #9face6);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 960px;
+      margin: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .balance {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background-color: #e0f7fa;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    form input, form select, form button {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    form input, form select {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    form button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #218838;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #f0f0f0;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .export-buttons button {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .export-buttons button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Tableau de bord</h2>
+
+    <div class="balance">
+      Solde du compte principal : <span id="balance">0 FCFA</span>
+    </div>
+
+    <form id="transactionForm">
+      <input type="text" id="desc" placeholder="Description" required>
+      <input type="number" id="montant" placeholder="Montant (FCFA)" required>
+      <input type="text" id="category" placeholder="Catégorie" required>
+      <select id="type">
+        <option value="revenu">Revenu</option>
+        <option value="depense">Dépense</option>
+      </select>
+      <button type="submit">Ajouter</button>
+    </form>
+
+    <table id="transactionsTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Catégorie</th>
+          <th>Description</th>
+          <th>Montant</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="export-buttons">
+      <button onclick="exporterPDF()">Exporter en PDF</button>
+      <button onclick="exporterExcel()">Exporter en Excel</button>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const tableBody = document.querySelector("#transactionsTable tbody");
+    const balanceDisplay = document.getElementById("balance");
+
+    let totalRevenus = 0;
+    let totalDepenses = 0;
+
+    async function chargerTransactions() {
+      tableBody.innerHTML = "";
+      totalRevenus = 0;
+      totalDepenses = 0;
+
+      const res = await fetch("http://localhost:5000/api/transactions", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+
+      data.forEach(tr => {
+        const date = tr.date || tr.createdAt || new Date();
+        const montant = Number(tr.amount);
+        if (tr.type === "revenu") totalRevenus += montant;
+        if (tr.type === "depense") totalDepenses += montant;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${new Date(date).toLocaleDateString()}</td>
+          <td>${tr.category || 'N/A'}</td>
+          <td>${tr.description}</td>
+          <td>${montant.toLocaleString()} FCFA</td>
+          <td>${tr.type}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      const solde = totalRevenus - totalDepenses;
+      balanceDisplay.textContent = `${solde.toLocaleString()} FCFA`;
+    }
+
+    document.getElementById("transactionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const desc = document.getElementById("desc").value;
+      const amount = parseFloat(document.getElementById("montant").value);
+      const category = document.getElementById("category").value;
+      const type = document.getElementById("type").value;
+
+      const res = await fetch("http://localhost:5000/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ description: desc, amount, category, type })
+      });
+
+      if (res.ok) {
+        document.getElementById("transactionForm").reset();
+        chargerTransactions();
+      } else {
+        alert("Erreur lors de l’ajout de la transaction.");
+      }
+    });
+
+    function exporterPDF() {
+      fetch("http://localhost:5000/api/transactions/export/pdf", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'transactions.pdf';
+          a.click();
+        });
+    }
+
+    function exporterExcel() {
+      fetch("http://localhost:5000/api/transactions/export/excel", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'transactions.xlsx';
+          a.click();
+        });
+    }
+
+    // Charger les transactions dès le chargement de la page
+    chargerTransactions();
+  </script>
+</body>
+</html>
